@@ -1,0 +1,78 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "title": "World Happiness Score & Logged GDP per Capita for 2021",
+    "width": 800,
+    "height": 600,
+    "description": "A scatterplot showing Happiness Score vs Logged GDP for 2021.",
+    "data": {
+      "url": "https://raw.githubusercontent.com/esoh0005/FIT3179_Week10_Homework/main/data/world-happiness-report-2021.csv"
+    },
+    "params": [
+      {
+        "name": "Logged_GDP_per_capita_Above",
+        "value": "0",
+        "bind": {
+          "input": "range",
+          "min": 6,
+          "max": 12,
+          "step": 0.5,
+          "name": "Minimum Logged GDP per capita"
+        }
+      }
+    ],
+    "transform": [
+      {"filter": "datum.Logged_GDP_per_capita > 0"},
+      {"filter": "datum.Happiness_Score > 0"},
+      {"filter": "datum.Logged_GDP_per_capita > Logged_GDP_per_capita_Above"}
+    ],
+    "layer": [
+      {
+        "mark": "point",
+        "encoding": {
+          "x": {
+            "field": "Happiness_Score",
+            "type": "quantitative",
+            "axis": {"tickCount": 13},
+            "scale": {"type": "log", "domain": [2, 10]}
+          },
+          "y": {
+            "field": "Logged_GDP_per_capita",
+            "type": "quantitative",
+            "axis": {"tickCount": 13},
+            "scale": {"type": "log", "domain": [6, 12]}
+          },
+          "tooltip": [
+            {"field": "Country", "type": "nominal"},
+            {"field": "Logged_GDP_per_capita", "type": "quantitative"},
+            {"field": "Happiness_Score", "type": "quantitative"}
+          ]
+        }
+      },
+      {
+        "transform": [
+          {"window": [{"op": "rank", "as": "ranking"}],
+           "sort": [{"field": "Happiness_Score", "order": "descending"}]
+          },
+          {"filter": "datum.ranking == 1"},
+          {
+            "calculate": "'Highest Happiness Score Logged GDP: ' + datum['Logged_GDP_per_capita'] ",
+            "as": "text_annotation"
+          }
+        ],
+        "mark": {
+          "type": "text",
+          "align": "left",
+          "baseline": "middle",
+          "dx": 5
+        },
+        "encoding": {
+          "text": {"field": "text_annotation", "type": "nominal"},
+          "x": {"value": 685}, 
+          "y": {"value": 92},  
+          "size": {"value": 12},
+          "color": {"value": "black"}
+        }
+      }
+    ]
+  }
+  
